@@ -1,29 +1,46 @@
 package service;
 
+import exception.InvalidParametersException;
 import model.Course;
+import model.Enrollment;
 import model.Student;
 import repository.StudentRepository;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StudentServiceImpl implements StudentService {
-    private StudentRepository repository;
+    private final StudentRepository repository;
+    private final EnrollmentService enrollmentService;
+    private final Clock clock;
 
-    public Student addStudent(String firstName, String lastName, int birthYear) {
-        //check nullability
-        return null;
+    public StudentServiceImpl(StudentRepository repository, EnrollmentService enrollmentService, Clock clock) {
+        this.repository = repository;
+        this.enrollmentService = enrollmentService;
+        this.clock = clock;
+    }
+
+    public Student addStudent(String firstName, String lastName, int birthYear) throws InvalidParametersException {
+        if (firstName == null || lastName == null) {
+            throw new InvalidParametersException();
+        }
+        return repository.save(new Student(firstName, lastName, birthYear));
     }
 
     public List<Student> getAllStudents() {
-        return null;
+        return repository.getAll();
     }
 
     public int getStudentAge(Student student) {
-        //testing using current date
-        return 0;
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(clock.instant(), clock.getZone());
+        return localDateTime.getYear() - student.getYearOfBirth();
     }
 
     public List<Course> getCourses(Student student) {
-        return null;
+        return enrollmentService.getEnrollments(student).stream()
+                .map(Enrollment::getCourse)
+                .collect(Collectors.toList());
     }
 }

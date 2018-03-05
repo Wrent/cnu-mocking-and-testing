@@ -1,12 +1,13 @@
 package service;
 
+import exception.InvalidParametersException;
 import model.Course;
 import model.Student;
 
 import java.util.List;
 
 public interface StudentService {
-    Student addStudent(String firstName, String lastName, int birthYear);
+    Student addStudent(String firstName, String lastName, int birthYear) throws InvalidParametersException;
 
     List<Student> getAllStudents();
 

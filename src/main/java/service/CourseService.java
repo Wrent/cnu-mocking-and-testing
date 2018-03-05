@@ -1,17 +1,21 @@
 package service;
 
+import exception.CourseNameAlreadyExistsException;
+import exception.InvalidParametersException;
 import model.Course;
 import model.Student;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CourseService {
-    Course addCourse(String name, String capacity);
-    void removeCourseByName(String name);
+    Course addCourse(String name, int capacity) throws CourseNameAlreadyExistsException, InvalidParametersException;
 
-    Course getCourseByName(String name);
+    Optional<Course> getCourseByName(String name);
 
     List<Student> getStudents(Course course);
 
-    Course enrollStudent(Course course, Student student);
+    boolean enrollStudent(Course course, Student student);
+
+    float countAverageEvaluationGrade(Course course);
 }

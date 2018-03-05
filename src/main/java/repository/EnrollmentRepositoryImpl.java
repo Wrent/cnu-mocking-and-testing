@@ -17,6 +17,11 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
     }
 
     @Override
+    public boolean contains(Enrollment enrollment) {
+        return enrollments.contains(enrollment);
+    }
+
+    @Override
     public List<Enrollment> getAll() {
         return new ArrayList<>(enrollments);
     }

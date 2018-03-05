@@ -10,11 +10,12 @@ public class StudentRepositoryImpl implements StudentRepository {
 
     @Override
     public Student save(Student student) {
-        return null;
+        students.add(student);
+        return student;
     }
 
     @Override
     public List<Student> getAll() {
-        return null;
+        return students;
     }
 }

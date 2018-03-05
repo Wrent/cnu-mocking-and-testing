@@ -1,32 +1,71 @@
 package service;
 
+import exception.CourseNameAlreadyExistsException;
+import exception.InvalidParametersException;
+import exception.StudentAlreadyEnrolledException;
 import model.Course;
 import model.Enrollment;
+import model.Grade;
 import model.Student;
+import repository.CourseRepository;
+import util.MathUtil;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
 
 public class CourseServiceImpl implements CourseService {
-    private EnrollmentService enrollmentService;
+    private final EnrollmentService enrollmentService;
+    private final CourseRepository repository;
 
-    public Course addCourse(String name, String capacity) {
-        return null;
+    public CourseServiceImpl(EnrollmentService enrollmentService, CourseRepository repository) {
+        this.enrollmentService = enrollmentService;
+        this.repository = repository;
     }
 
-    public void removeCourseByName(String name) {
-
+    @Override
+    public Course addCourse(String name, int capacity) throws CourseNameAlreadyExistsException, InvalidParametersException {
+        if (name == null) {
+            throw new InvalidParametersException();
+        }
+        return repository.save(new Course(name, capacity));
     }
 
-    public Course getCourseByName(String name) {
-        return null;
+    @Override
+    public Optional<Course> getCourseByName(String name) {
+        if (name == null) {
+            return Optional.empty();
+        }
+        return repository.getByName(name);
     }
 
-    public Course enrollStudent(Course course, Student student) {
-        //testing capacity, exception? we can use IAnswer here? -> EnrollmentService
-        return null;
+    @Override
+    public boolean enrollStudent(Course course, Student student) {
+        try {
+            enrollmentService.enroll(course, student);
+            return true;
+        } catch (StudentAlreadyEnrolledException e) {
+            return false;
+        }
     }
 
+    @Override
+    public float countAverageEvaluationGrade(Course course) {
+        List<Integer> grades = enrollmentService.getEnrollments(course).stream()
+                .filter(enrollment -> enrollment.getEvaluation().isEvaluated())
+                .map(enrollment -> enrollment.getEvaluation().getGrade())
+                .filter(Optional::isPresent)
+                .map(g -> g.get())
+                .collect(Collectors.toList());
+
+        return MathUtil.getAverageOfList(grades);
+    }
+
+    @Override
     public List<Student> getStudents(Course course) {
-        return null;
+        return enrollmentService.getEnrollments(course).stream()
+                .map(Enrollment::getStudent)
+                .collect(Collectors.toList());
     }
 }
