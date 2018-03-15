@@ -1,5 +1,6 @@
 package service;
 
+import exception.CourseIsFullException;
 import exception.CourseNameAlreadyExistsException;
 import exception.InvalidParametersException;
 import exception.StudentAlreadyEnrolledException;
@@ -46,6 +47,8 @@ public class CourseServiceImpl implements CourseService {
             enrollmentService.enroll(course, student);
             return true;
         } catch (StudentAlreadyEnrolledException e) {
+            return false;
+        } catch (CourseIsFullException e) {
             return false;
         }
     }

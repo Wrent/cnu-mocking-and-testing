@@ -1,5 +1,6 @@
 package service;
 
+import exception.CourseIsFullException;
 import exception.StudentAlreadyEnrolledException;
 import model.Course;
 import model.Enrollment;
@@ -17,18 +18,26 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
-    public Enrollment enroll(Course course, Student student) throws StudentAlreadyEnrolledException {
-        if (canEnroll(course, student)) {
-            repository.save(new Enrollment(student, course));
+    public Enrollment enroll(Course course, Student student) throws StudentAlreadyEnrolledException, CourseIsFullException {
+        if (isAlreadyEnrolled(course, student)) {
+            throw new StudentAlreadyEnrolledException();
         }
-        throw new StudentAlreadyEnrolledException();
+        if (!hasFreeSpots(course)) {
+            throw new CourseIsFullException();
+        }
+
+        return repository.save(new Enrollment(student, course));
     }
 
     @Override
     public boolean canEnroll(Course course, Student student) {
-        boolean alreadyEnrolled = repository.contains(new Enrollment(student, course));
+        boolean alreadyEnrolled = isAlreadyEnrolled(course, student);
 
         return !alreadyEnrolled && hasFreeSpots(course);
+    }
+
+    private boolean isAlreadyEnrolled(Course course, Student student) {
+        return repository.contains(new Enrollment(student, course));
     }
 
     private boolean hasFreeSpots(Course course) {

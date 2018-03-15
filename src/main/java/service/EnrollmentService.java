@@ -1,5 +1,6 @@
 package service;
 
+import exception.CourseIsFullException;
 import exception.StudentAlreadyEnrolledException;
 import model.Course;
 import model.Enrollment;
@@ -9,10 +10,8 @@ import java.util.List;
 
 public interface EnrollmentService {
 
-    //only if canEnroll
-    Enrollment enroll(Course course, Student student) throws StudentAlreadyEnrolledException;
+    Enrollment enroll(Course course, Student student) throws StudentAlreadyEnrolledException, CourseIsFullException;
 
-    //check for duplicities, capacity
     boolean canEnroll(Course course, Student student);
 
     List<Enrollment> getEnrollments(Course course);
